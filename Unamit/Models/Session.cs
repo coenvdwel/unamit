@@ -3,10 +3,6 @@
   public class Session
   {
     public string Id;
-
-    public Session()
-    {
-      Id = Utility.GetId();
-    }
+    public string User;
   }
 }

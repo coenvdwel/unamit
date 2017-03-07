@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Nancy;
-using Nancy.ModelBinding;
 
 namespace Unamit.Services
 {
@@ -8,11 +7,14 @@ namespace Unamit.Services
   {
     public User() : base("/user")
     {
-      Put["/"] = _ =>
+      Post["/"] = _ =>
       {
-        using (var conn = Database.Connect())
+        using (var conn = Utility.Connect())
         {
-          return conn.Execute("INSERT INTO [User] (Id, Password) VALUES (@Id, @Password)", this.Bind<User>());
+          var user = this.TryBind<Models.User>();
+          if (user == null) return HttpStatusCode.UnprocessableEntity;
+
+          return new { Success = conn.Execute("INSERT INTO [User] (Id, Password) VALUES (@Id, @Password)", new { Id = user.Id, Password = user.Password.Hash() }) == 1 };
         }
       };
     }
