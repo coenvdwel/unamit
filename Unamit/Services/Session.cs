@@ -1,5 +1,4 @@
-﻿using Dapper;
-using Nancy;
+﻿using Nancy;
 using System;
 using System.Linq;
 using System.Runtime.Caching;
@@ -11,7 +10,7 @@ namespace Unamit.Services
     public static MemoryCache Attempts = new MemoryCache("Unamit_Attempts");
     public static MemoryCache Sessions = new MemoryCache("Unamit_Sessions");
 
-    public Session() : base("/session")
+    public Session() : base("/sessions")
     {
       Post["/"] = _ =>
       {
@@ -24,13 +23,15 @@ namespace Unamit.Services
 
         using (var conn = Utility.Connect())
         {
-          var success = conn.Query<Models.User>("SELECT 1 FROM [User] WHERE Id = @Id AND Password = @Password", new { Id = user.Id, Password = user.Password.Hash() }).Any();
+          var success = conn.TryQuery<Models.User>("SELECT 1 FROM [User] WHERE [Id] = @Id AND [Password] = @Password", new { Id = user.Id, Password = Services.User.Hash(user.Password) }).Any();
           if (!success) return HttpStatusCode.Unauthorized;
 
-          Attempts.Remove(user.Id);
+          var session = new Models.Session { Id = Utility.GetId(), User = user.Id, Expires = DateTimeOffset.UtcNow.AddHours(8) };
 
-          var session = new Models.Session { Id = Utility.GetId(), User = user.Id };
-          return Sessions.AddOrGetExisting(user.Id, session, DateTimeOffset.UtcNow.AddHours(8)) as Models.Session ?? session;
+          Attempts.Remove(user.Id);
+          Sessions.Add(session.Id, session.User, session.Expires);
+
+          return session;
         }
       };
     }

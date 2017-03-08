@@ -1,11 +1,11 @@
-﻿using Nancy;
+﻿using Dapper;
+using Nancy;
 using Nancy.ModelBinding;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Unamit
 {
@@ -14,6 +14,24 @@ namespace Unamit
     public static string GetId()
     {
       return Guid.NewGuid().ToString().Replace("-", "");
+    }
+
+    public static bool LoggedIn(INancyModule m)
+    {
+      string user;
+      return LoggedIn(m, out user);
+    }
+
+    public static bool LoggedIn(INancyModule m, out string user)
+    {
+      var sid = (string)m.Request.Query["sid"];
+      if (string.IsNullOrEmpty(sid))
+      {
+        user = null;
+        return false;
+      }
+
+      return (user = Services.Session.Sessions.Get(sid) as string) != null;
     }
 
     public static IDbConnection Connect()
@@ -25,15 +43,6 @@ namespace Unamit
       return conn;
     }
 
-    public static string Hash(this string s, int i = 777)
-    {
-      if (i <= 0) return s;
-
-      var hash = new StringBuilder();
-      foreach (var b in new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(s), 0, Encoding.UTF8.GetByteCount(s))) hash.Append(b.ToString("x2"));
-      return hash.ToString().Hash(--i);
-    }
-
     public static T TryBind<T>(this INancyModule t)
     {
       try
@@ -43,6 +52,30 @@ namespace Unamit
       catch
       {
         return default(T);
+      }
+    }
+
+    public static bool TryExecute(this IDbConnection db, string sql, object param = null, int ok = 1)
+    {
+      try
+      {
+        return db.Execute(sql, param) == ok;
+      }
+      catch (Exception ex)
+      {
+        return false;
+      }
+    }
+
+    public static IEnumerable<T> TryQuery<T>(this IDbConnection db, string sql, object param = null)
+    {
+      try
+      {
+        return db.Query<T>(sql, param);
+      }
+      catch (Exception ex)
+      {
+        return new T[0];
       }
     }
   }

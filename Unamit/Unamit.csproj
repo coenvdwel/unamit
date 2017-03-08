@@ -65,7 +65,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\RatingValue.cs" />
+    <Compile Include="Models\Rating.cs" />
+    <Compile Include="Enums\Gender.cs" />
+    <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\Name.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Services\Group.cs" />
+    <Compile Include="Services\Name.cs" />
     <Compile Include="Services\User.cs" />
     <Compile Include="Services\Session.cs" />
     <Compile Include="Utility.cs" />
