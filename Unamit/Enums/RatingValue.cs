@@ -2,9 +2,9 @@
 {
   public enum RatingValue
   {
-    No = 0,
-    Doubtful = 60,
-    Probably = 70,
-    Yes = 100
+    No = -10,
+    Doubtful = 0,
+    Probably = 7,
+    Yes = 10
   }
 }

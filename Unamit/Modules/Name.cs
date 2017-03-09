@@ -1,7 +1,7 @@
 ﻿using Nancy;
 using System.Linq;
 
-namespace Unamit.Services
+namespace Unamit.Modules
 {
   public class Name : NancyModule
   {
@@ -16,11 +16,26 @@ namespace Unamit.Services
         {
           var name = conn.TryQuery<Models.Name>(@"
             
-            SELECT TOP 1 n.[Id], n.[Gender]
+            DECLARE @Partner nvarchar(150)
+            DECLARE @GroupScores table ([Group] nvarchar(150), Score int)
+
+            SELECT @Partner = u.[Partner]
+            FROM [User] u JOIN [User] p ON p.[Id] = u.[Partner] AND p.[Partner] = u.[Id]
+            WHERE u.[Id] = @User
+
+            INSERT INTO @GroupScores SELECT ng.[Group], SUM(r.Value) as [Score]
+            FROM [Rating] r JOIN [NameGroups] ng ON ng.[Name] = r.[Name]
+            WHERE r.[User] IN (@User, @Partner)
+            GROUP BY ng.[Group]
+
+            SELECT TOP(1) n.[Id], n.[Gender]
             FROM [Name] n
             LEFT OUTER JOIN [Rating] r ON r.[Name] = n.[Id] AND r.[User] = @User
-            WHERE r.[User] IS NULL
-            -- todo: order by group score
+            LEFT OUTER JOIN [Rating] pr ON pr.[Name] = n.[Id] AND pr.[User] = @Partner AND pr.[Value] > 0
+            LEFT OUTER JOIN [NameGroups] ng ON ng.[Name] = n.[Id]
+            LEFT OUTER JOIN @GroupScores gs ON gs.[Group] = ng.[Group]
+            WHERE r.[Value] IS NULL -- exclude those you already rated
+            ORDER BY pr.Value DESC, ISNULL(gs.[Score], 0) DESC
             
           ", new { User = user }).FirstOrDefault();
 

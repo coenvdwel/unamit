@@ -4,5 +4,6 @@
   {
     public string Id;
     public string Password;
+    public string Partner;
   }
 }

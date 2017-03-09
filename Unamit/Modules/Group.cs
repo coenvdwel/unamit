@@ -1,7 +1,7 @@
 ﻿using Nancy;
 using System.Linq;
 
-namespace Unamit.Services
+namespace Unamit.Modules
 {
   public class Group : NancyModule
   {

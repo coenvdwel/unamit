@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Runtime.Caching;
 
-namespace Unamit.Services
+namespace Unamit.Modules
 {
   public class Session : NancyModule
   {
@@ -23,7 +23,7 @@ namespace Unamit.Services
 
         using (var conn = Utility.Connect())
         {
-          var success = conn.TryQuery<Models.User>("SELECT 1 FROM [User] WHERE [Id] = @Id AND [Password] = @Password", new { Id = user.Id, Password = Services.User.Hash(user.Password) }).Any();
+          var success = conn.TryQuery<Models.User>("SELECT 1 FROM [User] WHERE [Id] = @Id AND [Password] = @Password", new { Id = user.Id, Password = Modules.User.Hash(user.Password) }).Any();
           if (!success) return HttpStatusCode.Unauthorized;
 
           var session = new Models.Session { Id = Utility.GetId(), User = user.Id, Expires = DateTimeOffset.UtcNow.AddHours(8) };

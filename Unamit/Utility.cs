@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Net;
 
 namespace Unamit
 {
@@ -31,7 +33,7 @@ namespace Unamit
         return false;
       }
 
-      return (user = Services.Session.Sessions.Get(sid) as string) != null;
+      return (user = Modules.Session.Sessions.Get(sid) as string) != null;
     }
 
     public static IDbConnection Connect()
@@ -49,9 +51,13 @@ namespace Unamit
       {
         return t.Bind<T>();
       }
-      catch
+      catch (Exception ex)
       {
+#if DEBUG
+        throw ex;
+#else
         return default(T);
+#endif
       }
     }
 
@@ -63,7 +69,11 @@ namespace Unamit
       }
       catch (Exception ex)
       {
+#if DEBUG
+        throw ex;
+#else
         return false;
+#endif
       }
     }
 
@@ -75,7 +85,40 @@ namespace Unamit
       }
       catch (Exception ex)
       {
+#if DEBUG
+        throw ex;
+#else
         return new T[0];
+#endif
+      }
+    }
+
+    public static string Get(string uri)
+    {
+      try
+      {
+        var req = (HttpWebRequest)WebRequest.Create(uri);
+        req.UserAgent = "Unamit";
+
+        using (var res = (HttpWebResponse)req.GetResponse())
+        {
+          using (var s = res.GetResponseStream())
+          {
+            if (s == null) return null;
+            using (var r = new StreamReader(s))
+            {
+              return r.ReadToEnd();
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+#if DEBUG
+        throw ex;
+#else
+        return null;
+#endif
       }
     }
   }
