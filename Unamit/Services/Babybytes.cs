@@ -1,5 +1,6 @@
 ﻿using FluentScheduler;
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Unamit.Enums;
@@ -17,6 +18,8 @@ namespace Unamit.Services
     {
       const string start = "<ul class='names_list'>";
       const string end = "</ul>";
+
+      var bogus = new[] { "nieuwe", "lezerbijdrage", "lezerbijdage", "onbekend", "zelf bedacht", "the bold and the beautyfull", "suzanne", "indianennaam" };
 
       var regex = new Regex(@"<span .*?>(.*?)<\/span><\/a> (.*?) (jongensnaam|meisjesnaam|gemengdenaam).", RegexOptions.Compiled);
       var sb = new StringBuilder();
@@ -39,7 +42,26 @@ namespace Unamit.Services
             var group = m.Groups[2].Value.Replace("'", "''");
             var gender = m.Groups[3].Value.ToLower() == "meisjesnaam" ? Gender.Female : m.Groups[3].Value.ToLower() == "jongensnaam" ? Gender.Male : Gender.Unisex;
 
-            if (group.ToLower() == "nieuwe" || group.ToLower() == "lezerbijdrage") group = null;
+            if (bogus.Contains(group.ToLower())) group = null;
+            if (group.ToLower() == "nederlands") group = "Nederlandse";
+            if (group.ToLower() == "zweden") group = "Zweedse";
+            if (group.ToLower() == "spaans") group = "Spaanse";
+            if (group.ToLower() == "scandinavisch ") group = "Scandinavische";
+            if (group.ToLower() == "keltisch") group = "Keltische";
+            if (group.ToLower() == "japans") group = "Japanse";
+            if (group.ToLower() == "itali") group = "Italiaanse";
+            if (group.ToLower() == "italiaans") group = "Italiaanse";
+            if (group.ToLower() == "iran") group = "Iraanse";
+            if (group.ToLower() == "hebreeuws") group = "Hebreeuwse";
+            if (group.ToLower() == "georgië") group = "Georgische";
+            if (group.ToLower() == "grieks/frans") group = "Griekse";
+            if (group.ToLower() == "fries") group = "Friese";
+            if (group.ToLower() == "frans ") group = "Franse";
+            if (group.ToLower() == "engelse-arabische") group = "Arabische";
+            if (group.ToLower() == "arabisch,fries") group = "Arabische";
+            if (group.ToLower() == "arabisch") group = "Arabische";
+            if (group.ToLower() == "engels") group = "Engelse";
+            if (group.ToLower() == "aramese") group = "Armeense";
 
             found = true;
             sb.AppendLine($"INSERT INTO @Table ([Name], [Group], [Gender]) VALUES ('{name}', '{group}', {(int)gender})");
