@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Unamit.Enums;
+using Unamit.Utility;
 
 namespace Unamit.Services
 {
@@ -31,7 +32,7 @@ namespace Unamit.Services
         for (var i = 1; i < 2500; i++)
         {
           var found = false;
-          var s = Utility.Get($"http://www.babybytes.nl/namen/?page={i}");
+          var s = Client.Get($"http://www.babybytes.nl/namen/?page={i}");
 
           s = s.Substring(s.IndexOf(start) + start.Length);
           s = s.Substring(0, s.IndexOf(end));
@@ -82,7 +83,7 @@ namespace Unamit.Services
 
     public void Finish(StringBuilder sb)
     {
-      using (var conn = Utility.Connect())
+      using (var conn = Db.Connect())
       {
         conn.TryExecute(sb.ToString() + @"
           

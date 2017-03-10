@@ -1,7 +1,7 @@
 ﻿using Nancy;
+using Nancy.Security;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using Unamit.Utility;
 
 namespace Unamit.Modules
 {
@@ -11,12 +11,12 @@ namespace Unamit.Modules
     {
       Post["/"] = _ =>
       {
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var user = this.TryBind<Models.User>();
           if (user == null) return HttpStatusCode.UnprocessableEntity;
 
-          user.Password = Hash(user.Password);
+          user.Password = Security.Hash(user.Password);
 
           if (!conn.TryExecute("INSERT INTO [User] ([Id], [Password], [Partner]) VALUES (@Id, @Password, @Partner)", new { user.Id, user.Password, user.Partner })) return HttpStatusCode.UnprocessableEntity;
           return user;
@@ -25,16 +25,15 @@ namespace Unamit.Modules
 
       Put["/me"] = _ =>
       {
-        string user;
-        if (!Utility.LoggedIn(this, out user)) return HttpStatusCode.Unauthorized;
+        this.RequiresAuthentication();
 
         var newUser = this.TryBind<Models.User>();
         if (newUser == null) return HttpStatusCode.UnprocessableEntity;
 
-        newUser.Id = user;
-        newUser.Password = string.IsNullOrEmpty(newUser.Password) ? null : Hash(newUser.Password);
+        newUser.Id = Context.CurrentUser.UserName;
+        newUser.Password = string.IsNullOrEmpty(newUser.Password) ? null : Security.Hash(newUser.Password);
 
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           if (!conn.TryExecute("UPDATE [User] SET [Password] = ISNULL(@Password, [Password]), [Partner] = @Partner WHERE [Id] = @Id", new { newUser.Id, newUser.Password, newUser.Partner })) return HttpStatusCode.UnprocessableEntity;
           return newUser;
@@ -43,28 +42,28 @@ namespace Unamit.Modules
 
       Get["/me/partner"] = _ =>
       {
-        string user;
-        if (!Utility.LoggedIn(this, out user)) return HttpStatusCode.Unauthorized;
+        this.RequiresAuthentication();
 
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
-          return conn.TryQuery<bool?>(@"
+          var bla = conn.TryScalar<bool?>(@"
             
             SELECT CASE WHEN u.[Partner] IS NULL THEN NULL ELSE CASE WHEN p.[Id] IS NULL THEN 0 ELSE 1 END END
             FROM [User] u
             LEFT OUTER JOIN [User] p ON p.[Id] = u.[Partner] AND p.[Partner] = u.[Id]
             WHERE u.[Id] = @User
             
-          ", new { user }).ToList();
+          ", new { User = Context.CurrentUser.UserName });
+
+          return bla;
         }
       };
 
       Get["/me/ratings"] = _ =>
       {
-        string user;
-        if (!Utility.LoggedIn(this, out user)) return HttpStatusCode.Unauthorized;
+        this.RequiresAuthentication();
 
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           return conn.TryQuery<Models.Rating>(@"
             
@@ -76,34 +75,24 @@ namespace Unamit.Modules
             
             SELECT DISTINCT [User], [Name], [Value] FROM [Rating] WHERE [User] IN (@User, @Partner)
             
-          ", new { user }).ToList();
+          ", new { User = Context.CurrentUser.UserName }).ToList();
         }
       };
 
       Post["/me/ratings"] = _ =>
       {
-        string user;
-        if (!Utility.LoggedIn(this, out user)) return HttpStatusCode.Unauthorized;
+        this.RequiresAuthentication();
 
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var rating = this.TryBind<Models.Rating>();
           if (rating == null) return HttpStatusCode.UnprocessableEntity;
 
-          rating.User = user;
+          rating.User = Context.CurrentUser.UserName;
           if (!conn.TryExecute("INSERT INTO [Rating] ([User], [Name], [Value]) VALUES (@User, @Name, @Value)", new { rating.User, rating.Value, rating.Name })) return HttpStatusCode.UnprocessableEntity;
           return rating;
         }
       };
-    }
-
-    public static string Hash(string s, int i = 777)
-    {
-      if (i <= 0) return s;
-
-      var hash = new StringBuilder();
-      foreach (var b in new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(s), 0, Encoding.UTF8.GetByteCount(s))) hash.Append(b.ToString("x2"));
-      return Hash(hash.ToString(), --i);
     }
   }
 }

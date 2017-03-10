@@ -1,5 +1,7 @@
 ﻿using Nancy;
+using Nancy.Security;
 using System.Linq;
+using Unamit.Utility;
 
 namespace Unamit.Modules
 {
@@ -7,44 +9,38 @@ namespace Unamit.Modules
   {
     public Group() : base("/groups")
     {
+      this.RequiresAuthentication();
+
       Post["/"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var group = this.TryBind<Models.Group>();
           if (group == null) return HttpStatusCode.UnprocessableEntity;
 
-          if (!conn.TryExecute("INSERT INTO [Group] (Id) VALUES (@Id)", new { Id = group.Id })) return HttpStatusCode.UnprocessableEntity;
+          if (!conn.TryExecute("INSERT INTO [Group] ([Id]) VALUES (@Id)", new { group.Id })) return HttpStatusCode.UnprocessableEntity;
           return group;
         }
       };
 
       Get["/{group}/names"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
-          var names = conn.TryQuery<Models.Name>(@"
+          return conn.TryQuery<Models.Name>(@"
             
-            SELECT DISTINCT n.Id, n.Gender
-            FROM Name n
-            JOIN NameGroups ng ON ng.Name = n.Id
+            SELECT DISTINCT n.[Id], n.[Gender]
+            FROM [Name] n
+            JOIN [NameGroups] ng ON ng.[Name] = n.[Id]
             WHERE ng.[Group] = @Group
             
           ", new { Group = (string)_.Group }).ToList();
-
-          return names;
         }
       };
 
       Post["/{group}/names"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var name = this.TryBind<Models.Name>();
           if (name == null) return HttpStatusCode.UnprocessableEntity;

@@ -1,5 +1,7 @@
 ﻿using Nancy;
+using Nancy.Security;
 using System.Linq;
+using Unamit.Utility;
 
 namespace Unamit.Modules
 {
@@ -7,17 +9,16 @@ namespace Unamit.Modules
   {
     public Name() : base("/names")
     {
+      this.RequiresAuthentication();
+
       Get["/"] = _ =>
       {
-        string user;
-        if (!Utility.LoggedIn(this, out user)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
-          var name = conn.TryQuery<Models.Name>(@"
+          return conn.TryQuery<Models.Name>(@"
             
             DECLARE @Partner nvarchar(150)
-            DECLARE @GroupScores table ([Group] nvarchar(150), Score int)
+            DECLARE @GroupScores table ([Group] nvarchar(150), [Score] int)
 
             SELECT @Partner = u.[Partner]
             FROM [User] u JOIN [User] p ON p.[Id] = u.[Partner] AND p.[Partner] = u.[Id]
@@ -34,21 +35,16 @@ namespace Unamit.Modules
             LEFT OUTER JOIN [Rating] pr ON pr.[Name] = n.[Id] AND pr.[User] = @Partner AND pr.[Value] > 0
             LEFT OUTER JOIN [NameGroups] ng ON ng.[Name] = n.[Id]
             LEFT OUTER JOIN @GroupScores gs ON gs.[Group] = ng.[Group]
-            WHERE r.[Value] IS NULL -- exclude those you already rated
+            WHERE r.[Value] IS NULL
             ORDER BY pr.Value DESC, ISNULL(gs.[Score], 0) DESC
             
-          ", new { User = user }).FirstOrDefault();
-
-          if (name == null) return HttpStatusCode.NoContent;
-          return name;
+          ", new { User = Context.CurrentUser.UserName }).FirstOrDefault();
         }
       };
 
       Post["/"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var name = this.TryBind<Models.Name>();
           if (name == null) return HttpStatusCode.UnprocessableEntity;
@@ -60,21 +56,15 @@ namespace Unamit.Modules
 
       Get["/{name}/groups"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
-          var groups = conn.TryQuery<Models.Group>("SELECT [Group] as Id FROM [NameGroups] WHERE [Name] = @Name", new { Name = (string)_.Name }).ToList();
-
-          return groups;
+          return conn.TryQuery<Models.Group>("SELECT [Group] as Id FROM [NameGroups] WHERE [Name] = @Name", new { Name = (string)_.Name }).ToList();
         }
       };
 
       Post["/{name}/groups"] = _ =>
       {
-        if (!Utility.LoggedIn(this)) return HttpStatusCode.Unauthorized;
-
-        using (var conn = Utility.Connect())
+        using (var conn = Db.Connect())
         {
           var group = this.TryBind<Models.Group>();
           if (group == null) return HttpStatusCode.UnprocessableEntity;

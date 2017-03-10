@@ -1,6 +1,7 @@
 ﻿using FluentScheduler;
 using System.Linq;
 using System.Text;
+using Unamit.Utility;
 
 namespace Unamit.Services
 {
@@ -13,7 +14,7 @@ namespace Unamit.Services
 
     public void Process()
     {
-      using (var conn = Utility.Connect())
+      using (var conn = Db.Connect())
       {
         var sb = new StringBuilder();
         var cs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
