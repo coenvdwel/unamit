@@ -13,7 +13,7 @@ namespace Unamit.Modules
 
       Post["/"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           var group = this.TryBind<Models.Group>();
           if (group == null) return HttpStatusCode.UnprocessableEntity;
@@ -25,7 +25,7 @@ namespace Unamit.Modules
 
       Get["/{group}/names"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           return conn.TryQuery<Models.Name>(@"
             
@@ -40,7 +40,7 @@ namespace Unamit.Modules
 
       Post["/{group}/names"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           var name = this.TryBind<Models.Name>();
           if (name == null) return HttpStatusCode.UnprocessableEntity;

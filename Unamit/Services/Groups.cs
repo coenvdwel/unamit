@@ -14,7 +14,7 @@ namespace Unamit.Services
 
     public void Process()
     {
-      using (var conn = Db.Connect())
+      using (var conn = Database.Connect())
       {
         var sb = new StringBuilder();
         var cs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

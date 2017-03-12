@@ -1,52 +1,64 @@
-var send = (url, type, data, success, error) => {
-  $.ajax({
-    url: url,
-    type: type,
+var body;
+var msg;
+var sid;
+
+var json = (url, options) => {
+  $.ajax(url, $.extend({}, {
+    type: 'get',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8',
-    data: JSON.stringify(data),
-    error: error,
-    success: success
-  });
+    headers: { 'Authorization': sid },
+    data: JSON.stringify(options.value),
+    error: (r) => {
+      msg.empty();
+      if (r.status == 401) {
+        r.statusText = "Invalid credentials";
+        if (sid != undefined) { Cookies.remove('session'); load(); }
+      }
+      else if (r.status == 429) r.statusText = "Too many requests - please wait";
+      msg.append($(`<span class="error">${r.statusText}.</span>`));
+    }
+  }, options));
 };
 
 var login = () => {
-
-  var success = (r) => {
-    Cookies.set('session', r.id);
-    load();
-  };
-
-  var error = () => {
-    alert('Invalid.');
-  };
-
-  send('/sessions', 'post', { id: $("#id").val(), password: $("#password").val() }, success, error);
+  var value = { id: $("#id").val(), password: $("#password").val() };
+  var success = (r) => { Cookies.set('session', r.id, { expires: 1 / 3 }); load(); };
+  json('/sessions', { type: 'post', value: value, success: success });
   return false;
 };
 
 var load = () => {
 
-  var body = $('#body');
-  var sid = Cookies.get('session');
+  body = $('#body');
+  msg = $('#msg');
+  sid = Cookies.get('session');
 
   body.empty();
+  msg.empty();
 
   if (sid == undefined) {
-
     var form = $('<form onsubmit="return login();"></form>').appendTo(body);
-
-    form.append($('<div><label for="id">Id</label><input id="id" name="id" type="text" required></div>'));
-    form.append($('<div><label for="password">Password</label><input id="password" name="password" type="password" required></div>'));
-    form.append($('<div><input type="submit" value="Log in"></div>'));
-
-    return;
+    form.append($('<input id="id" type="email" placeholder="Email Address" required>'));
+    form.append($('<input id="password" type="password" placeholder="Password" required>'));
+    return form.append($('<input type="submit" value="Log in">'));
   }
 
-  $.ajaxSetup({ headers: { 'Authorization': sid } });
+  json('/users/me', {
+    success: (r) => {
+      var info = $(`<span class="info">${r.id}</span>`).appendTo(msg);
+      if (r.partner != null) info.append($(`<span>${r.partner}${r.mutual == 0 ? ' (?)' : ''}</span>`));
+    }
+  });
 
-  body.append($('<p>Normal site</p>'));
-  send('/users/me/partner', 'get', null, (r) => body.append('<p>'+r+'</p>'));
+  json('/names', {
+    success: (r) => {
+      var gender = ['', 'male', 'female', 'unisex'];
+      for (var i = 0; i < r.length; i++) {
+        body.append($(`<div class="name ${gender[r[i].gender]}">${r[i].id}</div>`));
+      }
+    }
+  });
 
 };
 

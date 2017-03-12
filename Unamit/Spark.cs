@@ -46,6 +46,8 @@ namespace Unamit
         x.SetServiceName("Unamit");
         x.StartAutomatically();
       });
+
+      Console.ReadLine();
     }
   }
 }

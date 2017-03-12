@@ -90,9 +90,8 @@
     <Compile Include="Modules\Session.cs" />
     <Compile Include="Services\Groups.cs" />
     <Compile Include="Services\Babybytes.cs" />
-    <Compile Include="Utility\Db.cs" />
-    <Compile Include="Utility\Client.cs" />
-    <Compile Include="Utility\Utility.cs" />
+    <Compile Include="Utility\Database.cs" />
+    <Compile Include="Utility\Mapper.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Spark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,13 +106,13 @@
     <Content Include="Content\img\unamit.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\js\js.cookie.js">
+    <Content Include="Content\lib\js.cookie.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\js\unamit.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\js\jquery-1.10.2.min.js">
+    <Content Include="Content\lib\jquery-1.10.2.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="favicon.ico">

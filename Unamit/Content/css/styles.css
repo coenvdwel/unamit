@@ -1,0 +1,102 @@
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body {
+  font-family: 'Indie Flower', Sans-Serif;
+  font-size: 1em;
+  background-color: #2E2E2E;
+}
+
+#header {
+  padding: 10px;
+  background-color: #F79F81;
+  color: black;
+  font-size: 4em;
+  text-align: center;
+}
+
+  #header a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+#msg .error {
+  font-family: Sans-Serif;
+  display: block;
+  padding: 10px;
+  background-color: #F78181;
+  color: white;
+}
+
+#msg .info {
+  display: block;
+  padding: 10px 20px 10px 20px;
+  background-color: #2E2E2E;
+  color: white;
+}
+
+  #msg .info span {
+    float: right;
+    color: #A4A4A4;
+  }
+
+form {
+  padding: 10px;
+  background-color: white;
+  color: black;
+}
+
+input[type=email], input[type=password], input[type=submit] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: Sans-Serif;
+  padding: 0 10px 0 10px;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  margin-top: 1px;
+  background-color: white;
+  color: black;
+}
+
+input[type=submit] {
+  background-color: #DDDDDD;
+  color: black;
+}
+
+.name {
+  padding: 10px;
+  background-color: white;
+  color: black;
+  font-size: 2em;
+  text-align: center;
+}
+
+.male {
+  background-color: #5882FA;
+  color: white;
+}
+
+.female {
+  background-color: #F781D8;
+  color: white;
+}
+
+.unisex {
+  background-color: #9A2EFE;
+  color: white;
+}
+
+#footer {
+  padding: 15px;
+  background-color: #2E2E2E;
+  color: white;
+  font-size: 1em;
+  text-align: center;
+}

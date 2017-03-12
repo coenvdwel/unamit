@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 
 namespace Unamit.Utility
 {
-  public static class Db
+  public static class Database
   {
     public static IDbConnection Connect()
     {

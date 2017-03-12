@@ -4,7 +4,7 @@ using System;
 
 namespace Unamit.Utility
 {
-  public static class Utility
+  public static class Mapper
   {
     public static T TryBind<T>(this INancyModule t)
     {

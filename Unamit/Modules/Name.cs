@@ -13,7 +13,7 @@ namespace Unamit.Modules
 
       Get["/"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           return conn.TryQuery<Models.Name>(@"
             
@@ -28,23 +28,23 @@ namespace Unamit.Modules
             FROM [Rating] r JOIN [NameGroups] ng ON ng.[Name] = r.[Name]
             WHERE r.[User] IN (@User, @Partner)
             GROUP BY ng.[Group]
-
-            SELECT TOP(1) n.[Id], n.[Gender]
+            
+            SELECT DISTINCT TOP(5) n.[Id], n.[Gender], pr.Value, ISNULL(gs.[Score], 0), NEWID()
             FROM [Name] n
             LEFT OUTER JOIN [Rating] r ON r.[Name] = n.[Id] AND r.[User] = @User
             LEFT OUTER JOIN [Rating] pr ON pr.[Name] = n.[Id] AND pr.[User] = @Partner AND pr.[Value] > 0
             LEFT OUTER JOIN [NameGroups] ng ON ng.[Name] = n.[Id]
             LEFT OUTER JOIN @GroupScores gs ON gs.[Group] = ng.[Group]
             WHERE r.[Value] IS NULL
-            ORDER BY pr.Value DESC, ISNULL(gs.[Score], 0) DESC
+            ORDER BY pr.Value DESC, ISNULL(gs.[Score], 0) DESC, NEWID()
             
-          ", new { User = Context.CurrentUser.UserName }).FirstOrDefault();
+          ", new { User = Context.CurrentUser.UserName }).ToList();
         }
       };
 
       Post["/"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           var name = this.TryBind<Models.Name>();
           if (name == null) return HttpStatusCode.UnprocessableEntity;
@@ -56,7 +56,7 @@ namespace Unamit.Modules
 
       Get["/{name}/groups"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           return conn.TryQuery<Models.Group>("SELECT [Group] as Id FROM [NameGroups] WHERE [Name] = @Name", new { Name = (string)_.Name }).ToList();
         }
@@ -64,7 +64,7 @@ namespace Unamit.Modules
 
       Post["/{name}/groups"] = _ =>
       {
-        using (var conn = Db.Connect())
+        using (var conn = Database.Connect())
         {
           var group = this.TryBind<Models.Group>();
           if (group == null) return HttpStatusCode.UnprocessableEntity;
