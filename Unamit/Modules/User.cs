@@ -50,6 +50,7 @@ namespace Unamit.Modules
 
         newUser.Id = Context.CurrentUser.UserName;
         newUser.Password = string.IsNullOrEmpty(newUser.Password) ? null : Security.Hash(newUser.Password);
+        newUser.Partner = string.IsNullOrEmpty(newUser.Partner) ? null : newUser.Partner;
 
         using (var conn = Database.Connect())
         {

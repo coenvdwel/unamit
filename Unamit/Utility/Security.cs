@@ -1,5 +1,4 @@
-﻿using Nancy;
-using Nancy.Security;
+﻿using Nancy.Security;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
@@ -10,27 +9,65 @@ namespace Unamit.Utility
 {
   public static class Security
   {
-    public static MemoryCache Sessions = new MemoryCache("Unamit_Sessions");
-    public static MemoryCache Attempts = new MemoryCache("Unamit_Attempts");
+    private static MemoryCache _sessions = new MemoryCache("Unamit_Sessions");
+    private static MemoryCache _attempts = new MemoryCache("Unamit_Attempts");
 
-    public static Models.Session Session(string user)
+    public class User : IUserIdentity
+    {
+      public string SessionId { get; }
+      public string UserName { get; }
+      public IEnumerable<string> Claims { get; }
+
+      public User(string sessionId)
+      {
+        SessionId = sessionId;
+        UserName = _sessions.Get(sessionId) as string;
+      }
+    }
+
+#if DEBUG
+    static Security()
     {
       var session = new Models.Session
       {
-        Id = Guid.NewGuid().ToString().Replace("-", ""),
+        Id = "3320bc3c09154da1b94684cc9a183e82",
+        User = "coen@vdwel.me",
+        Expires = DateTimeOffset.UtcNow.AddHours(8)
+      };
+
+      _sessions.Add(session.Id, session.User, session.Expires);
+    }
+#endif
+
+    public static Models.Session Session(string user)
+    {
+      var id = Guid.NewGuid().ToString().Replace("-", "");
+
+#if DEBUG
+      if (user == "coen@vdwel.me") id = "3320bc3c09154da1b94684cc9a183e82";
+#endif
+
+      var session = new Models.Session
+      {
+        Id = id,
         User = user,
         Expires = DateTimeOffset.UtcNow.AddHours(8)
       };
 
-      Sessions.Add(session.Id, session.User, session.Expires);
-      Attempts.Remove(session.User);
+      _sessions.Add(session.Id, session.User, session.Expires);
+      _attempts.Remove(session.User);
       return session;
+    }
+
+    public static bool Logout(string sessionId)
+    {
+      return _sessions.Remove(sessionId) != null;
     }
 
     public static bool Limited(string user)
     {
       int attempt;
-      Attempts.Set(user, attempt = ((Attempts.Get(user) as int?) ?? 0) + 1, DateTimeOffset.UtcNow.AddMinutes(1));
+      _attempts.Set(user, attempt = ((_attempts.Get(user) as int?) ?? 0) + 1, DateTimeOffset.UtcNow.AddMinutes(1));
       return (attempt > 3);
     }
 
@@ -41,17 +78,6 @@ namespace Unamit.Utility
       var hash = new StringBuilder();
       foreach (var b in new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(s), 0, Encoding.UTF8.GetByteCount(s))) hash.Append(b.ToString("x2"));
       return Hash(hash.ToString(), --i);
-    }
-  }
-
-  public class User : IUserIdentity
-  {
-    public string UserName { get; }
-    public IEnumerable<string> Claims { get; }
-
-    public User(string auth)
-    {
-      UserName = Security.Sessions.Get(auth) as string;
     }
   }
 }

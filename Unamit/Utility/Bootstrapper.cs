@@ -10,7 +10,7 @@ namespace Unamit.Utility
     {
       pipelines.BeforeRequest += ctx =>
       {
-        ctx.CurrentUser = new User(ctx.Request.Headers.Authorization);
+        ctx.CurrentUser = new Security.User(ctx.Request.Headers.Authorization);
         return null;
       };
     }

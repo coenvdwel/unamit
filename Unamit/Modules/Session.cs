@@ -1,4 +1,5 @@
 ﻿using Nancy;
+using Nancy.Security;
 using Unamit.Utility;
 
 namespace Unamit.Modules
@@ -19,6 +20,13 @@ namespace Unamit.Modules
           if (!conn.TryScalar("SELECT COUNT(*) FROM [User] WHERE [Id] = @Id AND [Password] = @Password", new { Id = user.Id, Password = Security.Hash(user.Password) }, 1)) return HttpStatusCode.Unauthorized;
           return Security.Session(user.Id);
         }
+      };
+
+      Delete["/"] = _ =>
+      {
+        this.RequiresAuthentication();
+
+        return Security.Logout(Context.Request.Headers.Authorization);
       };
     }
   }

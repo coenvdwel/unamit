@@ -19,6 +19,7 @@ body {
   color: black;
   font-size: 4em;
   text-align: center;
+  text-shadow: 2px 2px 5px #945f4d;
 }
 
   #header a {
@@ -26,25 +27,32 @@ body {
     text-decoration: inherit;
   }
 
-#msg .error {
-  font-family: Sans-Serif;
-  display: block;
-  padding: 10px;
-  background-color: #F78181;
-  color: white;
+#msg {
 }
 
-#msg .info {
-  display: block;
-  padding: 10px 20px 10px 20px;
-  background-color: #2E2E2E;
-  color: white;
-}
-
-  #msg .info span {
-    float: right;
-    color: #A4A4A4;
+  #msg .logout {
+    color: red;
   }
+
+  #msg .error {
+    font-family: Sans-Serif;
+    display: block;
+    padding: 10px;
+    background-color: #F78181;
+    color: white;
+  }
+
+  #msg .info {
+    display: block;
+    padding: 10px 20px 10px 20px;
+    background-color: #2E2E2E;
+    color: white;
+  }
+
+    #msg .info span {
+      float: right;
+      color: #A4A4A4;
+    }
 
 form {
   padding: 10px;
@@ -68,6 +76,52 @@ input[type=email], input[type=password], input[type=submit] {
 input[type=submit] {
   background-color: #DDDDDD;
   color: black;
+}
+
+#loader {
+  height: 4px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #2E2E2E;
+}
+
+  #loader:before {
+    display: block;
+    position: absolute;
+    content: "";
+    left: -200px;
+    width: 200px;
+    height: 4px;
+    background-color: #2980b9;
+    animation: loading 2s linear infinite;
+  }
+
+@keyframes loading {
+  from {
+    left: -200px;
+    width: 30%;
+  }
+
+  50% {
+    width: 30%;
+  }
+
+  70% {
+    width: 70%;
+  }
+
+  80% {
+    left: 50%;
+  }
+
+  95% {
+    left: 120%;
+  }
+
+  to {
+    left: 100%;
+  }
 }
 
 .name {
