@@ -23,15 +23,14 @@ var swipe =
 	  swiping: false
 	},
   init: () => {
-    initElements($('.swipe'));
+    swipe.initElements($('.swipe'));
     $('body').on('mouseup touchend', swipe.end)
              .on('mousemove touchmove', swipe.move);
   },
   initElements: (e) => {
     e.on('mousedown touchstart', swipe.start)
      .css({ 'float': 'left', 'display': 'block', 'width': '100%', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'white-space': 'nowrap' })
-     .siblings().css({ 'float': 'left', 'display': 'block', 'width': 0 })
-     .parent().parent().append($('<br style="clear: both;" />'));
+     .siblings().css({ 'float': 'left', 'display': 'block', 'width': 0 });
   },
   start: (e) => {
     e.preventDefault();

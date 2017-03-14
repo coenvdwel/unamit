@@ -40,18 +40,18 @@ var logout = (i) => {
 };
 
 var addPartner = () => {
-  var value = { partner: $('#partner').val() };
-  json('/users/me', { type: 'put', value: value, success: load });
+  json('/users/me', { type: 'put', value: { partner: $('#partner').val() }, success: load });
   return false;
 }
 
-var rate = (e) => {
-  e = $(e);
-  // todo: proper animation/usage/handling
-  $('<div style="float: right; margin-top: -10px; width: 40px; background-color: red; padding: 10px;">No</div>').appendTo(e);
-  $('<div style="float: right; margin-top: -10px; width: 60px; background-color: orange; padding: 10px;">Doubtful</div>').appendTo(e);
-  $('<div style="float: right; margin-top: -10px; width: 60px; background-color: darkgreen; padding: 10px;">Probably</div>').appendTo(e);
-  $('<div style="float: right; margin-top: -10px; width: 40px; background-color: green; padding: 10px;">Yes</div>').appendTo(e);
+var rate = (name, value, e) => {
+  var success = (r) => {
+    loader.slideUp('slow');
+    $(e).parent().remove();
+    // todo: get new, append
+  };
+  json('/users/me/ratings', { type: 'post', value: { name: name, value: value }, success: success });
+  return false;
 };
 
 var load = () => {
@@ -80,13 +80,14 @@ var load = () => {
     success: (r) => {
       loader.slideUp('slow');
       for (var i = 0; i < r.length; i++) {
-        var wrapper = $(`<div></div>`).hide().appendTo(body).slideDown('slow').hide.appendTo(body);
-        $(`<a class="no" href="#" onclick="rate(${r[i].id}, -10);"></a><a class="doubtful" href="#" onclick="rate(${r[i].id}, 0);"></a>`).appendTo(wrapper);
-        var name = $(`<div class="name ${gender[r[i].gender]}">${r[i].id}</div>`).appendTo(wrapper);
-        $(`<a class="probably" href="#" onclick="rate(${r[i].id}, 7);"></a><a class="yes" href="#" onclick="rate(${r[i].id}, 10);"></a>`).appendTo(wrapper);
+        var name, wrapper = $(`<div></div>`)
+          .hide().appendTo(body)
+          .append($(`<a class="no" href="#" onclick="rate('${r[i].id}', -10, this);"></a><a class="doubtful" href="#" onclick="rate('${r[i].id}', 0, this);"></a>`))
+          .append(name = $(`<div class="name ${gender[r[i].gender]}">${r[i].id}</div>`))
+          .append($(`<a class="probably" href="#" onclick="rate('${r[i].id}', 7, this);"></a><a class="yes" href="#" onclick="rate('${r[i].id}', 10, this);"></a>`));
 
         swipe.initElements(name);
-        name.slideDown('slow');
+        wrapper.show();
       }
     }
   });
