@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
   
   <style type="text/css">
 	* {
@@ -83,12 +83,13 @@
 		// todo:
 		// - overextension choses default
 		// - clicking snaps to `snapTo` state
+		// - perhaps pre-cache elements on load
 		
 		config:
 		{
+			single: true, // only allow a single extended element
 			snapFrom: 30,
-			snapTo: 60,
-			single: true
+			snapTo: 60
 		},
 		session: 
 		{
@@ -100,13 +101,24 @@
 			by: undefined,
 			elements: { left: undefined, right: undefined }
 		},
+		init: () =>
+		{
+			var elements = $('.swipe').on('mousedown touchstart', swipe.start);
+			$('body').on('mouseup touchend', swipe.end).on('mousemove touchmove', swipe.move);
+			
+			elements.css({ 'float': 'left', 'display': 'block', 'width': '100%', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'white-space': 'nowrap' });
+			elements.siblings().css({ 'float': 'left', 'display': 'block', 'width': 0 });
+			$.unique(elements.parent().parent()).append($('<br style="clear: both;" />'));
+		},
 		start: (e) =>
 		{
+			e.preventDefault();
+			
 			var state = 0;
 			var target = $(e.target);
 			
 			if(swipe.session.swiping) return;
-			if(swipe.config.single && swipe.session.target != undefined && swipe.session.target[0] != target[0]) swipe.set(0);
+			if(swipe.config.single && swipe.session.target !== undefined && swipe.session.target[0] !== target[0]) swipe.set(0, true);
 			
 			swipe.session =
 			{
@@ -126,11 +138,19 @@
 			else if(swipe.session.elements.right.width() > 0) state = 1;
 			else return;
 			
-			var elements = (state == -1) ? swipe.session.elements.left : swipe.session.elements.right;
+			var elements = (state === -1) ? swipe.session.elements.left : swipe.session.elements.right;
 			var d = elements.width() * elements.length;
 			
 			swipe.session.width += d;
 			swipe.session.from += state * d;
+		},
+		end: (e) =>
+		{
+			if(!swipe.session.swiping) return;
+		
+			swipe.session.swiping = false;
+			var elements = swipe.session.by > 0 ? swipe.session.elements.left : swipe.session.elements.right;
+			swipe.set(elements.width() < swipe.config.snapFrom ? 0 : (swipe.session.by > 0 ? 1 : -1) * elements.length * swipe.config.snapTo, true);
 		},
 		move: (e) =>
 		{
@@ -139,31 +159,45 @@
 			swipe.session.to = e.clientX || e.originalEvent.touches[0].clientX;
 			swipe.set(swipe.session.to - swipe.session.from);
 		},
-		set: (e) =>
+		set: (e, animate) =>
 		{
-			if(Math.abs(swipe.session.by) >= swipe.session.width) return;
+			if(Math.abs(swipe.session.by) > swipe.session.width) return;
 			
 			swipe.session.by = e;
-			swipe.session.target.width(swipe.session.width - Math.abs(swipe.session.by));
-			swipe.session.elements.left.width(Math.abs(Math.max(0, swipe.session.by))/swipe.session.elements.left.length);
-			swipe.session.elements.right.width(Math.abs(Math.min(0, swipe.session.by))/swipe.session.elements.right.length);
-		},
-		end: (e) =>
-		{
-			swipe.session.swiping = false;
-			var elements = swipe.session.by > 0 ? swipe.session.elements.left : swipe.session.elements.right;
-			swipe.set(elements.width() < swipe.config.snapFrom ? 0 : (swipe.session.by > 0 ? 1 : -1) * elements.length * swipe.config.snapTo);
-		},
-		init: () =>
-		{
-			var elements = $('.swipe')
-				.on('mousedown touchstart', swipe.start)
-				.on('mouseup touchend', swipe.end)
-				.on('mousemove touchmove', swipe.move);
+			
+			var width = swipe.session.width - Math.abs(swipe.session.by);
+			var left = Math.abs(Math.max(0, swipe.session.by))/swipe.session.elements.left.length;
+			var right = Math.abs(Math.min(0, swipe.session.by))/swipe.session.elements.right.length;
+			
+			if(animate === true)
+			{
+				console.log({
+					width: width,
+					left: left,
+					right: right
+				});
 				
-			elements.css({ 'float': 'left', 'display': 'block', 'width': '100%', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'white-space': 'nowrap' });
-			elements.siblings().css({ 'float': 'left', 'display': 'block', 'width': 0 });
-			$.unique(elements.parent().parent()).append($('<br style="clear: both;" />'));
+				animate = undefined;
+			}
+			
+			if(animate !== true)
+			{
+				swipe.session.target.width(width);
+				swipe.session.elements.left.width(left);
+				swipe.session.elements.right.width(right);
+			}
+			else if(swipe.session.target.width() > width)
+			{
+				swipe.session.target.animate({ width: width });
+				swipe.session.elements.left.animate({ width: left });
+				swipe.session.elements.right.animate({ width: right });
+			}
+			else
+			{
+				swipe.session.elements.left.animate({ width: left });
+				swipe.session.elements.right.animate({ width: right });
+				swipe.session.target.animate({ width: width });
+			}
 		}
 	};
 	
