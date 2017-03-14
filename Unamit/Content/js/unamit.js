@@ -71,7 +71,7 @@ var load = () => {
 
   json('/users/me', {
     success: (r) => {
-      msg.append($(`<span class="info">${r.id} <i class="logout" onclick="logout();">x</i><span onclick="$('#partnerPanel').toggle('slow');">${(r.partner == null ? 'link partner' : r.partner + (r.mutual == 0 ? ' <i class="logout">x</i>' : ''))}</span></span>`));
+      msg.append($(`<span class="info">${r.id} <i class="logout" onclick="logout();">x</i><span onclick="$('#partnerPanel').toggle('slow');">${(r.partner == null ? 'link partner' : r.partner + (r.mutual == 0 ? ' <i class="notmutual">?</i>' : ''))}</span></span>`));
       $(`<span id="partnerPanel" class="info"><span><input type="submit" value="Ok" onclick="addPartner();" /></span><span><input id="partner" type="email" placeholder="Partner email" value="${(r.partner == null ? '' : r.partner)}" required /></span><br style="clear: both" /></span>`).hide().appendTo(msg);
     }
   });
@@ -79,7 +79,15 @@ var load = () => {
   json('/names', {
     success: (r) => {
       loader.slideUp('slow');
-      for (var i = 0; i < r.length; i++) $(`<div onclick="rate(this);" class="name ${gender[r[i].gender]}">${r[i].id}</div>`).hide().appendTo(body).slideDown('slow');
+      for (var i = 0; i < r.length; i++) {
+        var wrapper = $(`<div></div>`).hide().appendTo(body).slideDown('slow').hide.appendTo(body);
+        $(`<a class="no" href="#" onclick="rate(${r[i].id}, -10);"></a><a class="doubtful" href="#" onclick="rate(${r[i].id}, 0);"></a>`).appendTo(wrapper);
+        var name = $(`<div class="name ${gender[r[i].gender]}">${r[i].id}</div>`).appendTo(wrapper);
+        $(`<a class="probably" href="#" onclick="rate(${r[i].id}, 7);"></a><a class="yes" href="#" onclick="rate(${r[i].id}, 10);"></a>`).appendTo(wrapper);
+
+        swipe.initElements(name);
+        name.slideDown('slow');
+      }
     }
   });
 

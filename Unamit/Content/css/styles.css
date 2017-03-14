@@ -30,8 +30,9 @@ body {
 #msg {
 }
 
-  #msg .logout {
+  #msg .logout, #msg .notmutual {
     color: red;
+    font-family: Sans-Serif;
   }
 
   #msg .error {
@@ -145,6 +146,22 @@ input[type=submit] {
 .unisex {
   background-color: #9A2EFE;
   color: white;
+}
+
+.yes {
+  background-color: green;
+}
+
+.probab;y {
+  background-color: darkgreen;
+}
+
+.doubtful {
+  background-color: orange;
+}
+
+.no {
+  background-color: red;
 }
 
 #footer {
