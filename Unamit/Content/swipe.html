@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
   <title>Swipe</title>
@@ -6,192 +6,105 @@
   <meta http-equiv="Content-Type" content="text/html">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
-  
+  <script type="text/javascript" src="lib/swipe.js"></script>
   <style type="text/css">
-	* {
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-		border: 0;
-	}
+
+	  * {
+		  -moz-box-sizing: border-box;
+		  -webkit-box-sizing: border-box;
+		  box-sizing: border-box;
+		  margin: 0;
+		  padding: 0;
+		  border: 0;
+	  }
+
+    body
+    {
+      font-family: sans-serif;
+      font-size: .8em;
+      background-color: #333;
+    }
 	
-	body
-	{
-		background-color: #EEE;
-	}
+	  #header
+	  {
+		  padding: 10px;
+		  text-align: center;
+		  display: block;
+		  background-color: orange;
+	  }
 	
-	#header
-	{
-		padding: 10px;
-		text-align: center;
-		display: block;
-		background-color: orange;
-	}
+	  .swipe
+	  {
+		  padding: 10px;
+		  text-align: center;
+      background-color: #efefef;
+	  }
 	
-	#body
-	{
-		background-color: #CCC;
-	}
+	  #footer
+	  {
+		  padding: 20px;
+      height: 100px;
+		  text-align: center;
+      color: white;
+	  }
 	
-	.swipe
-	{
-		padding: 10px;
-		text-align: center;
-	}
+	  a
+	  {
+		  text-decoration: none;
+	  }
 	
-	#footer
-	{
-		padding: 10px;
-		text-align: center;
-		background-color: #EEE;
-	}
+	  .one
+	  {
+		  background-color: red;
+	  }
 	
-	a
-	{
-		text-decoration: none;
-	}
+	  .two
+	  {
+		  background-color: orange;
+	  }
 	
-	.one
-	{
-		background-color: red;
-	}
+	  .three
+	  {
+		  background-color: darkgreen;
+	  }
 	
-	.two
-	{
-		background-color: orange;
-	}
-	
-	.three
-	{
-		background-color: darkgreen;
-	}
-	
-	.four
-	{
-		background-color: green;
-	}
-	
+	  .four
+	  {
+		  background-color: green;
+	  }
 	
   </style>
-  
-  <script type="text/javascript">
-  
-	var swipe =
-	{
-		// todo:
-		// - overextension choses left-/rightmost option
-		// - preload data on initialize
-		
-		config:
-		{
-			single: true, // only allow a single extended element
-			snapFrom: 30, // snaps back before this point, or to `snapTo` beyond it
-			snapTo: 60 // fully extended width
-		},
-		session: 
-		{
-			swiping: false
-		},
-		init: () =>
-		{
-			$('.swipe')
-				.on('mousedown touchstart', swipe.start)
-				.css({ 'float': 'left', 'display': 'block', 'width': '100%', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'white-space': 'nowrap' })
-				.siblings().css({ 'float': 'left', 'display': 'block', 'width': 0 })
-				.parent().parent().append($('<br style="clear: both;" />'));
-			
-			$('body')
-				.on('mouseup touchend', swipe.end)
-				.on('mousemove touchmove', swipe.move);
-		},
-		start: (e) =>
-		{
-			e.preventDefault();
-			
-			var state = 0, target = $(e.target);
-			
-			if(swipe.session.swiping) return;
-			if(swipe.config.single && swipe.session.target !== undefined && swipe.session.target[0] !== target[0]) swipe.set(0);
-			
-			swipe.session =
-			{
-				swiping: true,
-				target: target,
-				width: target.outerWidth(),
-				from: e.clientX || e.originalEvent.touches[0].clientX,
-				elements: { left: target.prevAll().outerHeight(target.outerHeight()), right: target.nextAll().outerHeight(target.outerHeight()) }
-			};
-			
-			if(swipe.session.elements.left.outerWidth() > 0) state = -1;
-			else if(swipe.session.elements.right.outerWidth() > 0) state = 1;
-			else return;
-			
-			var elements = (state < 0) ? swipe.session.elements.left : swipe.session.elements.right;
-			var d = elements.outerWidth() * elements.length;
-			
-			swipe.session.width += d, swipe.session.from += state * d;
-		},
-		end: (e) =>
-		{
-			if(!swipe.session.swiping) return;
-			swipe.session.swiping = false;
-			
-			var clicked = swipe.session.by === undefined;
-			if(clicked)
-			{
-				if(swipe.session.elements.left.outerWidth() > 0 || swipe.session.elements.right.outerWidth() > 0) return swipe.set(0);
-				swipe.session.by = Math.sign(swipe.session.width/2 - (swipe.session.from - swipe.session.target.offset().left));
-			}
-			
-			var elements = swipe.session.by > 0 ? swipe.session.elements.left : swipe.session.elements.right;
-			swipe.set(elements.outerWidth() < swipe.config.snapFrom && !clicked ? 0 : Math.sign(swipe.session.by) * elements.length * swipe.config.snapTo);
-		},
-		move: (e) =>
-		{
-			if(!swipe.session.swiping) return;
-			
-			swipe.session.to = e.clientX || e.originalEvent.touches[0].clientX;
-			swipe.set(swipe.session.to - swipe.session.from);
-		},
-		set: (e) =>
-		{
-			var snapTo = swipe.config.snapTo * (e < 0 ? swipe.session.elements.right.length : swipe.session.elements.left.length);
-			
-			swipe.session.by = Math.abs(e) < snapTo ? e : Math.sign(e) * (snapTo + (Math.abs(e)-snapTo)/4);
-			swipe.session.target.outerWidth(swipe.session.width - Math.abs(swipe.session.by));
-			swipe.session.elements.left.outerWidth(Math.abs(Math.max(0, swipe.session.by))/swipe.session.elements.left.length);
-			swipe.session.elements.right.outerWidth(Math.abs(Math.min(0, swipe.session.by))/swipe.session.elements.right.length);
-		}
-	};
-	
-	$('document').ready(swipe.init);
-	
-  </script>
-  
 </head>
 <body>
-  <h1 id="header">Header</h1>
+  <h1 id="header">Swipe</h1>
   <div id="body">
 
-	<div>
-		<a class="one" href="#one"></a>
-		<a class="two" href="#two"></a>
-		<div class="swipe">This is line one (swipe me)</div>
-		<a class="three" href="#three"></a>
-		<a class="four" href="#four"></a>
-	</div>
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <div class="swipe">This is line one (swipe me)</div>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
 	
-	<div>
-		<a class="one" href="#one"></a>
-		<div class="swipe">This is line two (swipe me too)</div>
-		<a class="two" href="#two"></a>
-		<a class="three" href="#three"></a>
-		<a class="four" href="#four"></a>
-	</div>
+    <div>
+      <a class="one" href="#one"></a>
+      <div class="swipe">This is line two (swipe me too)</div>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
+
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <div class="swipe">And a third (swipe me three)</div>
+      <a class="four" href="#four"></a>
+    </div>
 	
   </div>
-  <div id="footer">Footer</div>
+  <br style="clear: both;" />
+  <div id="footer">Mollie Inc.</div>
 </body>
 </html>
