@@ -19,8 +19,8 @@ var unamit = {
       unamit.load.count++;
       unamit.elements.loader.slideDown();
     },
-    end: (f) => {
-      unamit.load.count -= f ? unamit.load.count : 1;
+    end: (force) => {
+      unamit.load.count -= force === true ? unamit.load.count : 1;
       if (unamit.load.count === 0) unamit.elements.loader.slideUp('slow');
     }
   },
