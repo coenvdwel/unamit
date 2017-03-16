@@ -1,5 +1,6 @@
 ﻿using Nancy;
 using Nancy.Security;
+using System;
 using System.Linq;
 using Unamit.Utility;
 
@@ -15,6 +16,9 @@ namespace Unamit.Modules
       {
         using (var conn = Database.Connect())
         {
+          var limit = (int)Request.Query["Limit"].TryParse<int>(5);
+          var exclude = ((string)Request.Query["Exclude[]"].TryParse<string>("")).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
           return conn.TryQuery<Models.Name>(@"
             
             DECLARE @Partner nvarchar(150)
@@ -29,16 +33,16 @@ namespace Unamit.Modules
             WHERE r.[User] IN (@User, @Partner)
             GROUP BY ng.[Group]
             
-            SELECT DISTINCT TOP(5) n.[Id], n.[Gender], pr.Value, ISNULL(gs.[Score], 0), NEWID()
+            SELECT DISTINCT TOP(@limit) n.[Id], n.[Gender], pr.Value, ISNULL(gs.[Score], 0), NEWID()
             FROM [Name] n
             LEFT OUTER JOIN [Rating] r ON r.[Name] = n.[Id] AND r.[User] = @User
             LEFT OUTER JOIN [Rating] pr ON pr.[Name] = n.[Id] AND pr.[User] = @Partner AND pr.[Value] > 0
             LEFT OUTER JOIN [NameGroups] ng ON ng.[Name] = n.[Id]
             LEFT OUTER JOIN @GroupScores gs ON gs.[Group] = ng.[Group]
-            WHERE r.[Value] IS NULL
+            WHERE r.[Value] IS NULL AND n.[Id] NOT IN @exclude
             ORDER BY pr.Value DESC, ISNULL(gs.[Score], 0) DESC, NEWID()
             
-          ", new { User = Context.CurrentUser.UserName }).ToList();
+          ", new { User = Context.CurrentUser.UserName, limit, exclude }).ToList();
         }
       };
 

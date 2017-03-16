@@ -1,0 +1,74 @@
+﻿<!doctype html>
+<html>
+<head>
+  <title>Swipe Plain</title>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="../js/swipe.js"></script>
+  <style type="text/css">
+    #container {
+      width: 350px;
+      background-color: #ddd;
+    }
+
+      #container:after {
+        content: '';
+        display: block;
+        clear: both;
+      }
+
+    a {
+      text-decoration: none;
+    }
+
+    .one {
+      background-color: red;
+    }
+
+    .two {
+      background-color: orange;
+    }
+
+    .three {
+      background-color: darkgreen;
+    }
+
+    .four {
+      background-color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="header">Swipe Plain</h1>
+  <div id="container">
+
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <div class="swipe">This is line one (swipe me)</div>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
+
+    <div>
+      <a class="one" href="#one"></a>
+      <div class="swipe">This is line two (swipe me too)</div>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
+
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <div class="swipe">And a third (swipe me three)</div>
+      <a class="four" href="#four"></a>
+    </div>
+
+  </div>
+  <div id="footer">Mollie Inc.</div>
+</body>
+</html>

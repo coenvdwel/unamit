@@ -1,0 +1,107 @@
+﻿<!doctype html>
+<html>
+<head>
+  <title>Swipe Multiple</title>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="../js/swipe.js"></script>
+  <script type="text/javascript">
+    swipe.config.single = false;
+  </script>
+  <style type="text/css">
+    * {
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      font-size: .8em;
+      background-color: #333;
+    }
+
+    #header {
+      padding: 10px;
+      text-align: center;
+      display: block;
+      background-color: orange;
+    }
+
+    #container:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+
+    .swipe {
+      padding: 10px;
+      text-align: center;
+      background-color: #efefef;
+    }
+
+    #footer {
+      padding: 20px;
+      height: 100px;
+      text-align: center;
+      color: white;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .one {
+      background-color: red;
+    }
+
+    .two {
+      background-color: orange;
+    }
+
+    .three {
+      background-color: darkgreen;
+    }
+
+    .four {
+      background-color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="header">Swipe Multiple</h1>
+  <div id="container">
+
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <div class="swipe">This is line one (swipe me)</div>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
+
+    <div>
+      <a class="one" href="#one"></a>
+      <div class="swipe">This is line two (swipe me too)</div>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <a class="four" href="#four"></a>
+    </div>
+
+    <div>
+      <a class="one" href="#one"></a>
+      <a class="two" href="#two"></a>
+      <a class="three" href="#three"></a>
+      <div class="swipe">And a third (swipe me three)</div>
+      <a class="four" href="#four"></a>
+    </div>
+
+  </div>
+  <div id="footer">Mollie Inc.</div>
+</body>
+</html>

@@ -127,44 +127,53 @@ input[type=submit] {
   }
 }
 
-.name {
-  padding: 10px;
-  background-color: white;
-  color: black;
-  font-size: 2em;
-  text-align: center;
+#container {
 }
 
-.male {
-  background-color: #5882FA;
-  color: white;
-}
+  #container:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
 
-.female {
-  background-color: #F781D8;
-  color: white;
-}
+  #container .name {
+    padding: 10px;
+    background-color: white;
+    color: black;
+    font-size: 2em;
+    text-align: center;
+  }
 
-.unisex {
-  background-color: #9A2EFE;
-  color: white;
-}
+  #container .male {
+    background-color: #5882FA;
+    color: white;
+  }
 
-.yes {
-  background-color: green;
-}
+  #container .female {
+    background-color: #F781D8;
+    color: white;
+  }
 
-.probably {
-  background-color: darkgreen;
-}
+  #container .unisex {
+    background-color: #9A2EFE;
+    color: white;
+  }
 
-.doubtful {
-  background-color: orange;
-}
+  #container .yes {
+    background-color: green;
+  }
 
-.no {
-  background-color: red;
-}
+  #container .probably {
+    background-color: darkgreen;
+  }
+
+  #container .doubtful {
+    background-color: orange;
+  }
+
+  #container .no {
+    background-color: red;
+  }
 
 #footer {
   padding: 15px;
@@ -172,5 +181,4 @@ input[type=submit] {
   color: white;
   font-size: 1em;
   text-align: center;
-  clear: both;
 }

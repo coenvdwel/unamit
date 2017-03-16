@@ -1,9 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unamit", "Unamit\Unamit.csproj", "{ED2B2D72-D14E-477F-ADF9-12F35278F583}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Swipe", "Swipe\", "{C692FBF9-4E35-42EE-81CE-9D79E13C03E9}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_11873"
+		Debug.AspNetCompiler.PhysicalPath = "Swipe\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_11873\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_11873"
+		Release.AspNetCompiler.PhysicalPath = "Swipe\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_11873\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "11873"
+		SlnRelativePath = "Swipe\"
+		StartServerOnDebug = "false"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +37,10 @@ Global
 		{ED2B2D72-D14E-477F-ADF9-12F35278F583}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED2B2D72-D14E-477F-ADF9-12F35278F583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED2B2D72-D14E-477F-ADF9-12F35278F583}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C692FBF9-4E35-42EE-81CE-9D79E13C03E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C692FBF9-4E35-42EE-81CE-9D79E13C03E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C692FBF9-4E35-42EE-81CE-9D79E13C03E9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{C692FBF9-4E35-42EE-81CE-9D79E13C03E9}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

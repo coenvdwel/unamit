@@ -5,79 +5,74 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
-  <script type="text/javascript" src="lib/swipe.js"></script>
+  <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="js/swipe.js"></script>
   <style type="text/css">
+    * {
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
 
-	  * {
-		  -moz-box-sizing: border-box;
-		  -webkit-box-sizing: border-box;
-		  box-sizing: border-box;
-		  margin: 0;
-		  padding: 0;
-		  border: 0;
-	  }
-
-    body
-    {
+    body {
       font-family: sans-serif;
       font-size: .8em;
       background-color: #333;
     }
-	
-	  #header
-	  {
-		  padding: 10px;
-		  text-align: center;
-		  display: block;
-		  background-color: orange;
-	  }
-	
-	  .swipe
-	  {
-		  padding: 10px;
-		  text-align: center;
+
+    #container:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+
+    #header {
+      padding: 10px;
+      text-align: center;
+      display: block;
+      background-color: orange;
+    }
+
+    .swipe {
+      padding: 10px;
+      text-align: center;
       background-color: #efefef;
-	  }
-	
-	  #footer
-	  {
-		  padding: 20px;
+    }
+
+    #footer {
+      padding: 20px;
       height: 100px;
-		  text-align: center;
+      text-align: center;
       color: white;
-	  }
-	
-	  a
-	  {
-		  text-decoration: none;
-	  }
-	
-	  .one
-	  {
-		  background-color: red;
-	  }
-	
-	  .two
-	  {
-		  background-color: orange;
-	  }
-	
-	  .three
-	  {
-		  background-color: darkgreen;
-	  }
-	
-	  .four
-	  {
-		  background-color: green;
-	  }
-	
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .one {
+      background-color: red;
+    }
+
+    .two {
+      background-color: orange;
+    }
+
+    .three {
+      background-color: darkgreen;
+    }
+
+    .four {
+      background-color: green;
+    }
   </style>
 </head>
 <body>
   <h1 id="header">Swipe</h1>
-  <div id="body">
+  <div id="container">
 
     <div>
       <a class="one" href="#one"></a>
@@ -86,7 +81,7 @@
       <a class="three" href="#three"></a>
       <a class="four" href="#four"></a>
     </div>
-	
+
     <div>
       <a class="one" href="#one"></a>
       <div class="swipe">This is line two (swipe me too)</div>
@@ -102,9 +97,8 @@
       <div class="swipe">And a third (swipe me three)</div>
       <a class="four" href="#four"></a>
     </div>
-	
+
   </div>
-  <br style="clear: both;" />
   <div id="footer">Mollie Inc.</div>
 </body>
 </html>
