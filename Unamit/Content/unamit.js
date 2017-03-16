@@ -39,7 +39,7 @@ var unamit = {
           if (unamit.sid !== undefined) unamit.logout(true);
         }
         else if (r.status === 429) r.statusText = 'Too many requests - please wait';
-        unamit.elements.msg.append($(`<span class="error">${r.statusText}.</span>`));
+        unamit.elements.msg.append($(`<div class="error">${r.statusText}.</div>`));
       },
       complete: unamit.loader.end
     }, options));
@@ -62,7 +62,16 @@ var unamit = {
 
   showLogin: () => {
     unamit.loader.end(true);
-    unamit.elements.container.append($('<form onsubmit="unamit.login(); return false;"><input id="id" type="email" placeholder="Email Address" required /><input id="password" type="password" placeholder="Password" required /><input type="submit" value="Log in" /></form>'));
+    unamit.elements.container.append($('<form class="login" onsubmit="unamit.login(); return false;"><input id="id" type="email" placeholder="Email Address" required /><input id="password" type="password" placeholder="Password" required /><input type="submit" value="Log in" /><div class="register">New user? Register <a href="#" onclick="unamit.showRegister(); return false;">here</a>.</div></form>'));
+  },
+
+  showRegister: () => {
+    unamit.elements.container.empty();
+    unamit.elements.container.append($('<form class="login" onsubmit="unamit.register(); return false;"><input id="id" type="email" placeholder="Email Address" required /><input id="password" type="password" placeholder="Password" required /><input type="submit" value="Register" /></form>'));
+  },
+
+  register: () => {
+    unamit.json('/users', { type: 'post', value: { id: $('#id').val(), password: $('#password').val() }, success: unamit.login });
   },
 
   login: () => {
@@ -71,7 +80,7 @@ var unamit = {
   },
 
   logout: (local) => {
-    if (local !== true) unamit.json('/sessions', { type: 'delete', data: null, headers: { 'Authorization': t }, error: null, complete: unamit.logout });
+    if (local === undefined) unamit.json('/sessions', { type: 'delete', data: null, error: null, complete: unamit.logout });
     else {
       Cookies.remove('session');
       unamit.sid = undefined;
@@ -81,8 +90,13 @@ var unamit = {
 
   user: () => {
     var success = (r) => {
-      $(`<span class="info">${r.id} <i class="logout" onclick="unamit.logout(); return false;">x</i><span onclick="unamit.elements.partnerPanel.toggle('slow');">${(r.partner === null ? 'link partner' : r.partner + (r.mutual === 0 ? ' <i class="notmutual">?</i>' : ''))}</span></span>`).appendTo(unamit.elements.msg);
-      unamit.elements.partnerPanel = $(`<span id="partnerPanel" class="info"><span><input type="submit" value="Ok" onclick="unamit.addPartner(); return false;" /></span><span><input id="partner" type="email" placeholder="Partner email" value="${(r.partner === null ? '' : r.partner)}" required /></span><br style="clear: both" /></span>`).hide().appendTo(unamit.elements.msg);
+      $(`<div class="info"><a href="#" onclick="unamit.elements.menu.toggle('slow'); return false;">${r.id}</a></div>`).appendTo(unamit.elements.msg);
+
+      unamit.elements.menu = $(`<div class="info"></div>`).hide().appendTo(unamit.elements.msg);
+      unamit.elements.menu.append($(`<form onsubmit="unamit.partner(); return false;"><label for="partner">Partner</label><input type="submit" value="Ok" /><div><input id="partner" type="email" placeholder="Partner email" value="${(r.partner === null ? '' : r.partner)}" ${(r.partner !== null && r.mutual === 0 ? 'style="color: #F78181;" ' : '')}/></div></form>`));
+      unamit.elements.menu.append($(`<form onsubmit="unamit.name(); return false;"><label for="name">Add name</label><input type="submit" value="Ok" /><div><input id="name" type="text" placeholder="Name" required /></div></form>`));
+      unamit.elements.menu.append($(`<form onsubmit="unamit.password(); return false;"><label for="old">Password</label><input type="submit" value="Ok" /><div><input id="old" type="password" placeholder="Old" required /><input id="new" type="password" placeholder="New" required /></div></form>`));
+      unamit.elements.menu.append($(`<form onsubmit="unamit.logout(); return false;" class="logout"><div><input type="submit" value="Log out" /></div></form>`));
     };
     unamit.json('/users/me', { success: success });
   },
@@ -93,46 +107,64 @@ var unamit = {
     return ids;
   },
 
-  load: (render) => {
+  load: (show) => {
     var success = (r) => {
       for (var i = 0; i < r.length; i++) unamit.names[r[i].id] = r[i];
-      if (render !== undefined) unamit.render(render);
+      if (show !== undefined) unamit.show(show);
     };
     unamit.json('/names', { data: { exclude: unamit.ids() }, success: success });
   },
 
-  render: (count) => {
+  show: (count) => {
     count = count || 1;
     $.each(unamit.names, function (id, value) {
-      if (count <= 0) return false; // break
-      if (value.shown === true) return true; // continue;
+      if (count <= 0) return false;
+      if (value.shown === true) return true;
 
       count--;
-      value.shown = true;
-      value.wrapper = $(`<div></div>`)
-        .hide().appendTo(unamit.elements.container)
-        .append($(`<a class="no" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.no); return false;"></a><a class="doubtful" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.doubtful); return false;"></a>`))
-        .append(value.element = $(`<div class="name ${unamit.gender[value.gender]}">${value.id}</div>`))
-        .append($(`<a class="probably" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.probably); return false;"></a><a class="yes" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.yes); return false;"></a>`));
-
-      swipe.initElements(value.element);
-      value.wrapper.show();
+      unamit.render(value);
     });
 
     if (unamit.ids().length < 10) unamit.load();
+  },
+
+  render: (value) => {
+    value.shown = true;
+    value.wrapper = $(`<div></div>`)
+      .hide().appendTo(unamit.elements.container)
+      .append($(`<a class="no" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.no); return false;"></a><a class="doubtful" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.doubtful); return false;"></a>`))
+      .append(value.element = $(`<div class="name ${unamit.gender[value.gender]}">${value.id}</div>`))
+      .append($(`<a class="probably" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.probably); return false;"></a><a class="yes" href="#" onclick="unamit.rate('${value.id}', unamit.ratings.yes); return false;"></a>`));
+
+    swipe.initElements(value.element);
+    value.wrapper.show();
   },
 
   rate: (name, value) => {
     var success = () => {
       unamit.names[name].wrapper.slideUp();
       delete unamit.names[name];
-      unamit.render();
+      unamit.show();
     };
     unamit.json('/users/me/ratings', { type: 'post', value: { name: name, value: value }, success: success });
   },
 
-  addPartner: () => {
+  partner: () => {
     unamit.json('/users/me', { type: 'put', value: { partner: $('#partner').val() }, success: unamit.init });
+  },
+
+  name: () => {
+    unamit.json('/names/' + $('#name').val(), {
+      success: (r) => {
+        unamit.names[r.id] = r;
+        unamit.render(r);
+        unamit.elements.menu.toggle('slow');
+      }
+    });
+  },
+
+  password: () => {
+    unamit.json('/users/me', { type: 'put', value: { password: $('#new').val() }, success: unamit.init });
   }
 };
 

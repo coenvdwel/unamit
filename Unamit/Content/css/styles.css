@@ -13,6 +13,24 @@ body {
   background-color: #2E2E2E;
 }
 
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: Sans-Serif;
+  padding: 0 10px 0 10px;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  margin-top: 1px;
+  background-color: white;
+  color: black;
+}
+
+  input[type=submit] {
+    background-color: #DDDDDD;
+    color: black;
+  }
+
 #header {
   padding: 10px;
   background-color: #F79F81;
@@ -30,56 +48,75 @@ body {
 #msg {
 }
 
-  #msg .logout, #msg .notmutual {
-    color: red;
-    font-family: Sans-Serif;
-    font-size: .7em;
-    font-style: normal;
-  }
-
   #msg .error {
     font-family: Sans-Serif;
-    display: block;
     padding: 10px;
     background-color: #F78181;
     color: white;
   }
 
   #msg .info {
-    display: block;
     padding: 10px 20px 10px 20px;
     background-color: #2E2E2E;
     color: white;
+    overflow: hidden;
   }
 
-    #msg .info span {
-      float: right;
-      color: #A4A4A4;
+    #msg .info a {
+      color: inherit;
+      text-decoration: inherit;
     }
 
-form {
+    #msg .info label {
+      float: left;
+      width: 100px;
+      display: block;
+      height: 40px;
+      line-height: 40px;
+      vertical-align: middle;
+    }
+
+    #msg .info input[type=submit] {
+      float: right;
+      width: 100px;
+    }
+
+    #msg .info div {
+      margin: 0 100px;
+    }
+
+      #msg .info div input[type=password] {
+        width: 50%;
+      }
+
+    #msg .info form.logout div {
+      margin: 0;
+    }
+
+    #msg .info form.logout div input[type=submit] {
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+.login {
   padding: 10px;
   background-color: white;
   color: black;
 }
 
-input[type=email], input[type=password], input[type=submit] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  font-family: Sans-Serif;
-  padding: 0 10px 0 10px;
-  width: 100%;
-  height: 40px;
-  line-height: 40px;
-  margin-top: 1px;
-  background-color: white;
-  color: black;
-}
+  .login .register {
+    font-family: Sans-Serif;
+    font-size: .7em;
+    text-align: right;
+    color: #2E2E2E;
+    background-color: #DDDDDD;
+    padding: 5px;
+  }
 
-input[type=submit] {
-  background-color: #DDDDDD;
-  color: black;
-}
+    .login .register a {
+      color: inherit;
+    }
 
 #loader {
   height: 4px;

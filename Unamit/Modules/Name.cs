@@ -45,6 +45,21 @@ namespace Unamit.Modules
         }
       };
 
+
+      Get["/{name}"] = _ =>
+      {
+        using (var conn = Database.Connect())
+        {
+          return conn.TryQuery<Models.Name>(@"
+            
+            SELECT n.[Id], n.[Gender]
+            FROM [Name] n
+            WHERE n.[Id] = @Name
+            
+          ", new { Name = _.name.Value.ToString() }).FirstOrDefault();
+        }
+      };
+
       Post["/"] = _ =>
       {
         using (var conn = Database.Connect())
