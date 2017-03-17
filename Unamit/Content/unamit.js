@@ -3,11 +3,14 @@ var unamit = {
   sid: undefined,
 
   names: {},
+  resultView: false,
   gender: ['', 'male', 'female', 'unisex'],
   ratings: { no: -10, doubtful: 0, probably: 7, yes: 10 },
+  ratingValues: { '-10': 'no', '0': 'doubtful', '7': 'probably', '10': 'yes' },
 
   elements: {
-    msg: undefined,
+    menu: undefined,
+    message: undefined,
     loader: undefined,
     container: undefined
   },
@@ -33,13 +36,14 @@ var unamit = {
       headers: { 'Authorization': unamit.sid },
       data: JSON.stringify(options.value),
       error: (r) => {
-        unamit.elements.msg.empty();
+        unamit.elements.message.empty();
         if (r.status === 401) {
+          if (unamit.sid !== undefined) return unamit.logout(true);
           r.statusText = 'Invalid credentials';
-          if (unamit.sid !== undefined) unamit.logout(true);
         }
         else if (r.status === 429) r.statusText = 'Too many requests - please wait';
-        unamit.elements.msg.append($(`<div class="error">${r.statusText}.</div>`));
+        else unamit.elements.container.empty();
+        unamit.elements.message.append($(`<div class="error">${r.statusText}.</div>`));
       },
       complete: unamit.loader.end
     }, options));
@@ -47,17 +51,21 @@ var unamit = {
 
   init: () => {
     unamit.sid = unamit.sid || Cookies.get('session');
-    unamit.elements.msg = unamit.elements.msg || $('#msg');
+    unamit.elements.menu = unamit.elements.menu || $('#menu');
+    unamit.elements.message = unamit.elements.message || $('#message');
     unamit.elements.loader = unamit.elements.loader || $('#loader');
     unamit.elements.container = unamit.elements.container || $('#container');
 
-    unamit.elements.msg.empty();
+    unamit.elements.menu.empty();
+    unamit.elements.message.empty();
     unamit.elements.container.empty();
+
+    unamit.resultView = false;
 
     if (unamit.sid === undefined) return unamit.showLogin();
 
-    unamit.user();
-    unamit.load(5);
+    unamit.menu();
+    unamit.load();
   },
 
   showLogin: () => {
@@ -88,11 +96,11 @@ var unamit = {
     }
   },
 
-  user: () => {
+  menu: () => {
     var success = (r) => {
-      $(`<div class="info"><a href="#" onclick="unamit.elements.menu.toggle('slow'); return false;">${r.id}</a></div>`).appendTo(unamit.elements.msg);
+      $(`<div><a href="#" onclick="unamit.elements.menu.toggle('slow'); return false;">${r.id}</a><a href="#" onclick="unamit.toggleResults(this); return false;">Results</a></div>`).appendTo(unamit.elements.menu);
 
-      unamit.elements.menu = $(`<div class="info"></div>`).hide().appendTo(unamit.elements.msg);
+      unamit.elements.menu = $(`<div></div>`).hide().appendTo(unamit.elements.menu);
       unamit.elements.menu.append($(`<form onsubmit="unamit.partner(); return false;"><label for="partner">Partner</label><input type="submit" value="Ok" /><div><input id="partner" type="email" placeholder="Partner email" value="${(r.partner === null ? '' : r.partner)}" ${(r.partner !== null && r.mutual === 0 ? 'style="color: #F78181;" ' : '')}/></div></form>`));
       unamit.elements.menu.append($(`<form onsubmit="unamit.name(); return false;"><label for="name">Add name</label><input type="submit" value="Ok" /><div><input id="name" type="text" placeholder="Name" required /></div></form>`));
       unamit.elements.menu.append($(`<form onsubmit="unamit.password(); return false;"><label for="old">Password</label><input type="submit" value="Ok" /><div><input id="old" type="password" placeholder="Old" required /><input id="new" type="password" placeholder="New" required /></div></form>`));
@@ -101,22 +109,37 @@ var unamit = {
     unamit.json('/users/me', { success: success });
   },
 
-  ids: () => {
-    var ids = [];
-    $.each(unamit.names, function (id, value) { ids.push(id); });
+  toggleResults: (e) => {
+    unamit.elements.menu.hide('slow');
+    unamit.elements.container.empty();
+    unamit.resultView = !unamit.resultView;
+    $(e).css({ color: unamit.resultView ? "#F78181" : "white" });
+
+    if (!unamit.resultView) return unamit.show();
+    $.each(unamit.names, function (id, value) { if (value.shown === true) value.shown = false; });
+    
+    var success = (r) => {
+      for (var i = 0; i < r.length; i++) unamit.elements.container.append($(`<div><div class="value ${unamit.ratingValues[r[i].partnerValue]}">P</div><div class="value ${unamit.ratingValues[r[i].value]}">U</div><div class="name ${unamit.gender[r[i].gender]}">${r[i].id}</div></div>`));
+    };
+    unamit.json('/users/me/ratings', { success: success });
+  },
+
+  ids: (fn) => {
+    var ids = [], fn = fn || (() => { return true; });
+    $.each(unamit.names, (id, value) => { if (fn(value)) ids.push(id); });
     return ids;
   },
 
-  load: (show) => {
+  load: () => {
     var success = (r) => {
       for (var i = 0; i < r.length; i++) unamit.names[r[i].id] = r[i];
-      if (show !== undefined) unamit.show(show);
+      if(!unamit.resultView) unamit.show();
     };
     unamit.json('/names', { data: { exclude: unamit.ids() }, success: success });
   },
 
-  show: (count) => {
-    count = count || 1;
+  show: () => {
+    var count = 5 - unamit.ids((v) => { return v.shown === true; }).length;
     $.each(unamit.names, function (id, value) {
       if (count <= 0) return false;
       if (value.shown === true) return true;

@@ -65,15 +65,22 @@ namespace Unamit.Modules
 
         using (var conn = Database.Connect())
         {
-          return conn.TryQuery<Models.Rating>(@"
+          return conn.Query(@"
             
-            DECLARE @Partner nvarchar(150)
-            
+            DECLARE @Partner nvarchar(150)     
             SELECT @Partner = u.[Partner]
             FROM [User] u JOIN [User] p ON p.[Id] = u.[Partner] AND p.[Partner] = u.[Id]
             WHERE u.[Id] = @User
             
-            SELECT DISTINCT [User], [Name], [Value] FROM [Rating] WHERE [User] IN (@User, @Partner)
+            SELECT n.[Id], n.[Gender], r.[Value], r.[PartnerValue]
+            FROM [Name] n
+            JOIN (
+              SELECT ISNULL(u.[Id], p.[Id]) as [Id], u.[Value], p.[Value] as [PartnerValue]
+              FROM (SELECT r.[Name] as [Id], r.[Value] FROM [Rating] r WHERE r.[User] = @User) u
+              FULL OUTER JOIN (SELECT r.[Name] as [Id], r.[Value] FROM [Rating] r WHERE r.[User] = @Partner) p ON u.[Id] = p.[Id]
+              WHERE u.[Value] > 0 OR p.[Value] > 0
+            ) r ON r.[Id] = n.[Id]
+            ORDER BY (ISNULL(r.[Value], 0) + ISNULL(r.[PartnerValue], 0)) DESC
             
           ", new { User = Context.CurrentUser.UserName }).ToList();
         }

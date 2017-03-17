@@ -45,59 +45,61 @@ input {
     text-decoration: inherit;
   }
 
-#msg {
+#menu > div {
+  padding: 10px 20px 10px 20px;
+  background-color: #2E2E2E;
+  color: white;
+  overflow: hidden;
 }
 
-  #msg .error {
-    font-family: Sans-Serif;
-    padding: 10px;
-    background-color: #F78181;
-    color: white;
+  #menu div a {
+    color: inherit;
+    text-decoration: inherit;
   }
 
-  #msg .info {
-    padding: 10px 20px 10px 20px;
-    background-color: #2E2E2E;
-    color: white;
-    overflow: hidden;
+  #menu div a:nth-child(2)
+  {
+    float: right;
   }
 
-    #msg .info a {
-      color: inherit;
-      text-decoration: inherit;
+  #menu div label {
+    float: left;
+    width: 100px;
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    vertical-align: middle;
+  }
+
+  #menu div input[type=submit] {
+    float: right;
+    width: 100px;
+  }
+
+  #menu div div {
+    margin: 0 100px;
+  }
+
+    #menu div div input[type=password] {
+      width: 50%;
     }
 
-    #msg .info label {
-      float: left;
-      width: 100px;
-      display: block;
-      height: 40px;
-      line-height: 40px;
-      vertical-align: middle;
-    }
+  #menu div form.logout div {
+    margin: 0;
+  }
 
-    #msg .info input[type=submit] {
-      float: right;
-      width: 100px;
-    }
-
-    #msg .info div {
-      margin: 0 100px;
-    }
-
-      #msg .info div input[type=password] {
-        width: 50%;
-      }
-
-    #msg .info form.logout div {
-      margin: 0;
-    }
-
-    #msg .info form.logout div input[type=submit] {
+    #menu div form.logout div input[type=submit] {
       width: 100%;
       margin-top: 10px;
       margin-bottom: 5px;
     }
+
+#message div {
+  font-family: Sans-Serif;
+  padding: 10px;
+  background-color: #F78181;
+  color: white;
+}
 
 .login {
   padding: 10px;
@@ -110,7 +112,6 @@ input {
     font-size: .7em;
     text-align: right;
     color: #2E2E2E;
-    background-color: #DDDDDD;
     padding: 5px;
   }
 
@@ -174,6 +175,16 @@ input {
   }
 
   #container .name {
+    padding: 10px;
+    background-color: white;
+    color: black;
+    font-size: 2em;
+    text-align: center;
+  }
+
+  #container .value {
+    float: right;
+    width: 60px;
     padding: 10px;
     background-color: white;
     color: black;

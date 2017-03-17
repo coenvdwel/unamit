@@ -32,7 +32,7 @@ namespace Unamit.Modules
             WHERE r.[User] IN (@User, @Partner)
             GROUP BY ng.[Group]
             
-            SELECT DISTINCT TOP(10) n.[Id], n.[Gender], pr.Value, ISNULL(gs.[Score], 0), NEWID()
+            SELECT DISTINCT TOP(20) n.[Id], n.[Gender], pr.Value, ISNULL(gs.[Score], 0), NEWID()
             FROM [Name] n
             LEFT OUTER JOIN [Rating] r ON r.[Name] = n.[Id] AND r.[User] = @User
             LEFT OUTER JOIN [Rating] pr ON pr.[Name] = n.[Id] AND pr.[User] = @Partner AND pr.[Value] > 0

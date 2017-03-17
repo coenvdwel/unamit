@@ -6,7 +6,7 @@ namespace Unamit.Modules
   {
     public Base()
     {
-      Get["/"] = _ => View["Content/index.html"];
+      Get["/"] = _ => View["Content/unamit.html"];
     }
   }
 }
