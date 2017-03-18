@@ -82,13 +82,10 @@
     </Content>
     <Compile Include="Utility\Bootstrapper.cs" />
     <Compile Include="Utility\Security.cs" />
-    <Compile Include="Enums\RatingValue.cs" />
+    <Compile Include="Enums\Rating.cs" />
     <Compile Include="Models\Rating.cs" />
     <Compile Include="Enums\Gender.cs" />
-    <Compile Include="Models\Group.cs" />
-    <Compile Include="Models\Name.cs" />
     <Compile Include="Models\User.cs" />
-    <Compile Include="Modules\Group.cs" />
     <Compile Include="Modules\Name.cs" />
     <Compile Include="Modules\User.cs" />
     <Compile Include="Modules\Session.cs" />

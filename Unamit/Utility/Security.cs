@@ -25,27 +25,9 @@ namespace Unamit.Utility
       }
     }
 
-#if DEBUG
-    static Security()
-    {
-      var session = new Models.Session
-      {
-        Id = "3320bc3c09154da1b94684cc9a183e82",
-        User = "coen@vdwel.me",
-        Expires = DateTimeOffset.UtcNow.AddHours(8)
-      };
-
-      _sessions.Add(session.Id, session.User, session.Expires);
-    }
-#endif
-
     public static Models.Session Session(string user)
     {
       var id = Guid.NewGuid().ToString().Replace("-", "");
-
-#if DEBUG
-      if (user == "coen@vdwel.me") id = "3320bc3c09154da1b94684cc9a183e82";
-#endif
 
       var session = new Models.Session
       {

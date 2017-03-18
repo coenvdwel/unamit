@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -34,22 +33,6 @@ namespace Unamit.Utility
       }
     }
 
-    public static T TryScalar<T>(this IDbConnection db, string sql, object param = null)
-    {
-      try
-      {
-        return db.ExecuteScalar<T>(sql, param);
-      }
-      catch (Exception ex)
-      {
-#if DEBUG
-        throw ex;
-#else
-        return default(T);
-#endif
-      }
-    }
-
     public static bool TryScalar<T>(this IDbConnection db, string sql, object param, T ok)
     {
       try
@@ -62,22 +45,6 @@ namespace Unamit.Utility
         throw ex;
 #else
         return false;
-#endif
-      }
-    }
-
-    public static IEnumerable<T> TryQuery<T>(this IDbConnection db, string sql, object param = null)
-    {
-      try
-      {
-        return db.Query<T>(sql, param);
-      }
-      catch (Exception ex)
-      {
-#if DEBUG
-        throw ex;
-#else
-        return new T[0];
 #endif
       }
     }

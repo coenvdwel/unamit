@@ -1,0 +1,15 @@
+Security
+
+* "I'm not a robot" check when registering
+* Properly check old password when setting new
+
+Functionality
+
+* Add "success" type messages (when set partner, etc)
+* Allow adding names (Id, Gender)
+* Allow adding groups (Id)
+* Allow linking names to groups
+
+Other
+
+* Move Swipe into own repo

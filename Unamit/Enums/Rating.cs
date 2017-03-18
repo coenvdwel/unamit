@@ -1,6 +1,6 @@
 ﻿namespace Unamit.Enums
 {
-  public enum RatingValue
+  public enum Rating
   {
     No = -10,
     Doubtful = 0,

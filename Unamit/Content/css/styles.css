@@ -31,6 +31,10 @@ input {
     color: black;
   }
 
+  input[type=radio]:checked {
+    border: 4px solid orange;
+  }
+
 #header {
   padding: 10px;
   background-color: #F79F81;
@@ -52,47 +56,50 @@ input {
   overflow: hidden;
 }
 
-  #menu div a {
-    color: inherit;
-    text-decoration: inherit;
-  }
+#menu div a {
+  color: inherit;
+  text-decoration: inherit;
+}
 
-  #menu div a:nth-child(2)
-  {
+  #menu div a:nth-child(2) {
     float: right;
   }
 
-  #menu div label {
-    float: left;
-    width: 100px;
-    display: block;
-    height: 40px;
-    line-height: 40px;
-    vertical-align: middle;
+#menu div label {
+  float: left;
+  width: 100px;
+  display: block;
+  height: 40px;
+  line-height: 40px;
+  vertical-align: middle;
+}
+
+#menu div input[type=submit] {
+  float: right;
+  width: 100px;
+}
+
+#menu div div {
+  margin: 0 100px;
+}
+
+  #menu div div input[type=password] {
+    width: 50%;
   }
 
-  #menu div input[type=submit] {
-    float: right;
-    width: 100px;
+#menu div form.stretch div {
+  margin: 0;
+}
+
+  #menu div form.stretch div input[type=radio] {
+    width: 33.3333%;
   }
 
-  #menu div div {
-    margin: 0 100px;
+  #menu div form.stretch div input[type=submit] {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 5px;
   }
-
-    #menu div div input[type=password] {
-      width: 50%;
-    }
-
-  #menu div form.logout div {
-    margin: 0;
-  }
-
-    #menu div form.logout div input[type=submit] {
-      width: 100%;
-      margin-top: 10px;
-      margin-bottom: 5px;
-    }
 
 #message div {
   font-family: Sans-Serif;
@@ -165,6 +172,21 @@ input {
   }
 }
 
+.male {
+  background-color: #5882FA !important;
+  color: white !important;
+}
+
+.female {
+  background-color: #F781D8 !important;
+  color: white !important;
+}
+
+.unisex {
+  background-color: #9A2EFE !important;
+  color: white !important;
+}
+
 #container {
 }
 
@@ -192,21 +214,6 @@ input {
     text-align: center;
   }
 
-  #container .male {
-    background-color: #5882FA;
-    color: white;
-  }
-
-  #container .female {
-    background-color: #F781D8;
-    color: white;
-  }
-
-  #container .unisex {
-    background-color: #9A2EFE;
-    color: white;
-  }
-
   #container .yes {
     background-color: green;
   }
@@ -227,6 +234,7 @@ input {
   padding: 15px;
   background-color: #2E2E2E;
   color: white;
+  height: 120px;
   font-size: 1em;
   text-align: center;
 }
