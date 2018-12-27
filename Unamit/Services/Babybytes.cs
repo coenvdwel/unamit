@@ -23,28 +23,26 @@ namespace Unamit.Services
       { "", new[] { "nieuwe", "lezerbijdrage", "lezerbijdage", "onbekend", "zelf bedacht", "the bold and the beautyfull", "suzanne", "indianennaam" } },
       { "Nederlandse", new[] {"nederlands", "nederland"} },
       { "Zweedse", new[] { "zweden", "zweeds" } },
+      { "Indische", new[] { "indische", "oudindische", "names_indi" } },
       { "Spaanse", new[] { "spaans", "spanje" } },
       { "Scandinavische", new[] { "scandinavisch" } },
       { "Keltische", new[] { "keltisch" } },
       { "Japanse", new[] { "japans", "japan" } },
       { "Italiaanse", new[] { "itali", "italiaans", "italie", "italië" } },
       { "Iraanse", new[] { "iran", "iraans" } },
-      { "Hebreeuwse", new[] { "hebreeuws" } },
+      { "Hebreeuwse", new[] { "hebreeuws", "names_hebr" } },
       { "Georgische", new[] { "georgisch", "georgië", "georgie" } },
       { "Griekse", new[] { "grieks/frans", "grieks", "griekenland" } },
       { "Friese", new[] { "fries", "friesland" } },
-      { "Franse", new[] { "frans", "frankrijk" } },
+      { "Franse", new[] { "frans", "frankrijk", "names_fren" } },
       { "Arabische", new[] { "engelse-arabische", "arabisch,fries", "arabisch", "arabie", "arabië" } },
-      { "Engelse", new[] { "engels", "engeland" } },
+      { "Engelse", new[] { "engels", "engeland", "oudengelse" } },
       { "Armeense", new[] { "aramese", "armenie", "armenië" } }
     };
 
     public void Process()
     {
-      const string start = "<ul class='names_list'>";
-      const string end = "</ul>";
-
-      var regex = new Regex(@"<span .*?>(.*?)<\/span><\/a> (.*?) (jongensnaam|meisjesnaam|gemengdenaam).", RegexOptions.Compiled);
+      var regex = new Regex(@"<div class='nameblock'>\s*<div .*?>(.*?)<\/div>(.*?)<br>(.*?) <span .*? <\/div>", RegexOptions.Compiled);
       var sb = new StringBuilder();
 
       try
@@ -56,14 +54,11 @@ namespace Unamit.Services
           var found = false;
           var s = Get($"http://www.babybytes.nl/namen/?page={i}");
 
-          s = s.Substring(s.IndexOf(start) + start.Length);
-          s = s.Substring(0, s.IndexOf(end));
-
           foreach (Match m in regex.Matches(s))
           {
             var name = m.Groups[1].Value.Replace("'", "''").Trim();
             var group = m.Groups[2].Value.Replace("'", "''").Trim();
-            var gender = m.Groups[3].Value.Trim().ToLower() == "meisjesnaam" ? Gender.Female : m.Groups[3].Value.Trim().ToLower() == "jongensnaam" ? Gender.Male : Gender.Unisex;
+            var gender = m.Groups[3].Value.Trim().ToLower().Contains("meisjesnamen") ? Gender.Female : m.Groups[3].Value.Trim().ToLower().Contains("jongensnamen") ? Gender.Male : Gender.Unisex;
 
             if (Mappings.Any(x => x.Value.Contains(group.ToLower()))) group = Mappings.First(x => x.Value.Contains(group.ToLower())).Key;
             if (string.IsNullOrEmpty(group)) group = null;

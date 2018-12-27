@@ -65,6 +65,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Topshelf, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
@@ -96,6 +97,7 @@
     <Compile Include="Models\Session.cs" />
     <Compile Include="Spark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Setup.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
